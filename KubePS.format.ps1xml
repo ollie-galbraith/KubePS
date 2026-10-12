@@ -26,7 +26,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem><PropertyName>IpAddress</PropertyName></TableColumnItem>
@@ -67,7 +67,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem><PropertyName>IpAddress</PropertyName></TableColumnItem>
@@ -105,7 +105,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
@@ -148,7 +148,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
@@ -182,7 +182,7 @@
                 <Label>Age</Label>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </ListItem>
               <ListItem>
@@ -220,7 +220,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
@@ -287,7 +287,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
@@ -323,7 +323,7 @@
               <TableColumnItem>
                 <ScriptBlock>
                   $Timestamp = ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')
-                  Resolve-ResourceAge -Timestamp $Timestamp
+                  Resolve-KubeResourceAge -Timestamp $Timestamp
                 </ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
