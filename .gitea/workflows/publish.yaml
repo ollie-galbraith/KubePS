@@ -17,14 +17,26 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/powershell:lts-ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Set up PowerShell
-        uses: mchave3/setup-pwsh@v1.0.0
+        run: |
+          # Update package list
+          sudo apt-get update
+          # Install pre-requisite packages
+          sudo apt-get install -y wget apt-transport-https software-properties-common
+          # Download the Microsoft repository key
+          wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
+          # Register the Microsoft repository key
+          sudo dpkg -i packages-microsoft-prod.deb
+          # Delete the deb file after root access
+          rm packages-microsoft-prod.deb
+          # Update package list after adding Microsoft repo
+          sudo apt-get update
+          # Install PowerShell
+          sudo apt-get install -y powershell
 
       - name: Publish KubePS Module
         shell: pwsh
