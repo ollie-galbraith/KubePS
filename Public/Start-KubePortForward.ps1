@@ -1,14 +1,32 @@
-Function Start-PortForward
+Function Start-KubePortForward
     {
+        <#
+        .SYNOPSIS
+            Opens a local port-forward to a pod and relays traffic between the local port and the pod's target port while keeping the connection active for interactive debugging or service access.
+            This command binds local listeners, creates the Kubernetes port-forward session, and forwards data bidirectionally so a local process can connect to a service inside the cluster as though it were running on the host.
+
+        .EXAMPLE
+            Start-KubePortForward -Pod api -Namespace default -LocalPort 8080 -RemotePort 80
+            # Forwards local port 8080 to port 80 on the api pod.
+
+        .EXAMPLE
+            Start-KubePortForward -Pod web -Namespace prod -LocalPort 9090 -RemotePort 8080 -Addresses 127.0.0.1
+            # Exposes the pod service locally on a specific loopback address.
+
+        .EXAMPLE
+            Set-KubeSelectedNamespace -Namespace default
+            Start-KubePortForward -Pod api -LocalPort 8080 -RemotePort 80
+            # Uses the current default namespace when no namespace is explicitly provided.
+        #>
         [CmdletBinding()]
         param(
-            [Parameter(Mandatory, Position = 1)]
+            [Parameter(Mandatory=$true, Position = 1)]
             [ValidateRange(0, 65535)]
             [int]$LocalPort,
-            [Parameter(Mandatory, Position = 2)]
+            [Parameter(Mandatory=$true, Position = 2)]
             [ValidateRange(1, 65535)]
             [int]$RemotePort,
-            [Parameter(Position = 3)]
+            [Parameter(Mandatory=$False, Position = 3)]
             [string[]]$Addresses = @('127.0.0.1')
         )
 
@@ -20,8 +38,8 @@ Function Start-PortForward
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Pods = Get-Pod -AllNamespaces
-                $Namespaces = Get-Namespace
+                $Pods = Get-KubePod -AllNamespaces
+                $Namespaces = Get-KubeNamespace
 
                 $ParamList = @(
                     @{
@@ -58,7 +76,7 @@ Function Start-PortForward
                 $Namespace = $DynamicParameterDictionary['Namespace'].Value
                 If([string]::IsNullOrWhiteSpace($Namespace))
                     {
-                        Write-Error 'Specify -Namespace or use Set-SelectedNamespace.' -Category InvalidArgument
+                        Write-Error 'Specify -Namespace or use Set-KubeSelectedNamespace.' -Category InvalidArgument
                         Return
                     }
 

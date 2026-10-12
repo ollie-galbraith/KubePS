@@ -11,4 +11,4 @@ Update-FormatData -PrependPath (Join-Path $PSScriptRoot 'KubePS.format.ps1xml') 
 
 Export-ModuleMember -Function $PublicMembers
 
-Get-KubePSClient
+Get-KubeClient

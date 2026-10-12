@@ -1,10 +1,27 @@
-Function Get-ReplicaSet
+Function Get-KubeReplicaSet
     {
+        <#
+        .SYNOPSIS
+            Lists replica sets in a namespace and optionally narrows the output to a specific name or regex pattern so deployment health and rollout state can be inspected quickly.
+            This command provides the desired, current, and ready replica counts for each replica set, which helps operators monitor deployment behavior and identify under-replicated workloads.
+
+        .EXAMPLE
+            Get-KubeReplicaSet -Namespace default
+            # Lists all replica sets in the default namespace.
+
+        .EXAMPLE
+            Get-KubeReplicaSet -Namespace default -ReplicaSet api
+            # Shows only the replica set whose name matches api.
+
+        .EXAMPLE
+            Get-KubeReplicaSet -Namespace default -All
+            # Includes replica sets with zero desired replicas so you can see inactive or scaled-down workloads.
+        #>
         [CmdletBinding()]
         param(
-            [Parameter(Position = 0, HelpMessage = 'The replica set name or regular expression to match.')]
+            [Parameter(Mandatory=$false, Position = 0, HelpMessage = 'The replica set name or regular expression to match.')]
             [string]$ReplicaSet,
-            [Parameter(HelpMessage = 'Include replica sets with zero desired replicas.')]
+            [Parameter(Mandatory=$false, HelpMessage = 'Include replica sets with zero desired replicas.')]
             [switch]$All
         )
 
@@ -16,13 +33,13 @@ Function Get-ReplicaSet
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Namespaces = Get-Namespace
+                $Namespaces = Get-KubeNamespace
 
                 $ParamList = @(
                     @{
                         ParameterName    = 'Namespace'
                         ParameterType    = ([string])
-                        Default          = $Script:SelectedNamespace
+                        DefaultValue     = $Script:SelectedNamespace
                         Mandatory        = $False
                         ValidateSet      = [array]$Namespaces.Name
                         HelpMessage      = 'The namespace to set as the context for retrieving deployments.'

@@ -1,5 +1,23 @@
-Function Set-Context
+Function Set-KubeContext
     {
+        <#
+        .SYNOPSIS
+            Selects a Kubernetes context for the active KubePS session and rebuilds the cached client so subsequent commands target the chosen cluster.
+            This command uses the merged kubeconfig data and validates the requested context name before updating the session state and refreshing the direct Kubernetes client connection.
+
+        .EXAMPLE
+            Set-KubeContext -Context default
+            # Switches KubePS to the default cluster context.
+
+        .EXAMPLE
+            Get-KubeContext -Current
+            # Verifies the cluster currently selected by KubePS after switching contexts.
+
+        .EXAMPLE
+            Set-KubeContext -Context 'prod-cluster'
+            Get-KubePod -Namespace default
+            # Switches to the production cluster and immediately queries its pods.
+        #>
         [CmdletBinding()]
         param()
 
@@ -11,7 +29,7 @@ Function Set-Context
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Contexts = Get-Context
+                $Contexts = Get-KubeContext
 
                 $ParamList = @(
                     @{
@@ -38,7 +56,7 @@ Function Set-Context
                 $Script:KubePSContext = $DynamicParameterDictionary['Context'].Value
                 Try
                     {
-                        Get-KubePSClient | Out-Null
+                        Get-KubeClient | Out-Null
                     }
                 Catch
                     {

@@ -2,21 +2,30 @@ Function ConvertFrom-DescriptionFields
     {
         <#
         .SYNOPSIS
-            Converts lines of text from description fields into a hashtable.
-            This function takes an array of lines containing description fields in the format "    Key: Value"
-            and converts them into an ordered hashtable where the keys are the field names and the values are the field values.
+            Parses indented Kubernetes description output into an ordered dictionary where each field name becomes a key and its value is preserved as a string.
+            This helper is intended for output that is formatted in "Key: Value" pairs, such as resource and node detail text, so it can be transformed into structured PowerShell data for later filtering or display.
 
         .EXAMPLE
-            $lines = @(
-                '    Name: MyPod',
-                '    Namespace: default'
+            $Lines = @(
+                '    Name: my-pod',
+                '    Namespace: default',
+                '    Ready: 1/1'
             )
-            ConvertFrom-DescriptionFields -Lines $lines
+            ConvertFrom-DescriptionFields -Lines $Lines
+            # Returns an ordered hashtable like @{ Name = 'my-pod'; Namespace = 'default'; Ready = '1/1' }
+
+        .EXAMPLE
+            $Text = @(
+                '    CPU Requests: 250m',
+                '    Memory Requests: 128Mi'
+            )
+            ConvertFrom-DescriptionFields -Lines $Text
+            # Converts resource summary lines into name/value pairs for reuse in custom objects.
         #>
 
         [CmdletBinding()]
         param(
-            [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The lines of text to convert from description fields.')]
+            [Parameter(Mandatory=$True, Position=0, HelpMessage='The lines of text to convert from description fields.')]
             [string[]]$Lines
         )
 

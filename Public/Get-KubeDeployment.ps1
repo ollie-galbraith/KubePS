@@ -1,10 +1,27 @@
-Function Get-Deployment
+Function Get-KubeDeployment
     {
+        <#
+        .SYNOPSIS
+            Lists Kubernetes deployments in a namespace and optionally filters by deployment name or regex so operators can inspect replica readiness, age, and container information quickly.
+            This command queries the apps/v1 deployment API for the selected namespace and returns a compact summary by default, or full deployment objects when -FullOutput is supplied.
+
+        .EXAMPLE
+            Get-KubeDeployment -Namespace default
+            # Lists deployments in the default namespace with readiness and replica summary information.
+
+        .EXAMPLE
+            Get-KubeDeployment -Namespace default -Deployment api
+            # Returns the deployment named api only.
+
+        .EXAMPLE
+            Get-KubeDeployment -Namespace kube-system -Deployment 'nginx.*' -FullOutput
+            # Returns the matching deployment objects with their full Kubernetes metadata.
+        #>
         [CmdletBinding()]
         param(
-            [Parameter(Position = 0, HelpMessage = 'The deployment name or regular expression to match.')]
+            [Parameter(Mandatory=$False, Position=0, HelpMessage='The deployment name or regular expression to match.')]
             [string]$Deployment,
-            [Parameter(HelpMessage = 'Return the full Kubernetes deployment objects.')]
+            [Parameter(Mandatory=$False, HelpMessage='Return the full Kubernetes deployment objects.')]
             [switch]$FullOutput
         )
 
@@ -16,13 +33,13 @@ Function Get-Deployment
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Namespaces = Get-Namespace
+                $Namespaces = Get-KubeNamespace
 
                 $ParamList = @(
                     @{
                         ParameterName    = 'Namespace'
                         ParameterType    = ([string])
-                        Default          = $Script:SelectedNamespace
+                        DefaultValue     = $Script:SelectedNamespace
                         Mandatory        = $False
                         ValidateSet      = [array]$Namespaces.Name
                         HelpMessage      = 'The namespace to set as the context for retrieving deployments.'

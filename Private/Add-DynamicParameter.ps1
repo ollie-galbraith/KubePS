@@ -2,44 +2,51 @@ Function Add-DynamicParameter
     {
         <#
         .SYNOPSIS
-        Adds a dynamic parameter to a PowerShell function or script. For use in advanced functions or scripts with dynamic parameters defined in the DynamicParameters() block.
-        For more examples of how to use this function, see the DynamicParam{} block in the [Start-AnsibleJobTemplate](../../../LTF-Ansible/Public/Controller/Job/Start-AnsibleJobTemplate.ps1) cmdlet in the LTF-AnsiblePS module.
+            Creates and registers a dynamic PowerShell parameter in a RuntimeDefinedParameterDictionary so advanced functions can validate input against live data such as namespace names, pod names, or node names without hardcoding those values in the static param block.
+            This helper is used throughout KubePS to build dynamic parameters for context-aware commands that need to reflect the current cluster state at runtime, including validation sets, aliases, default values, mandatory flags, and custom completion metadata.
+
         .EXAMPLE
-        # Add a dynamic parameter named "ExampleParam" of type string
-        Add-DynamicParameter -DynamicParameterDictionary $DynamicParameters -ParameterName "ExampleParam" -ParameterType [string]
+            $DynamicParameters = [System.Management.Automation.RuntimeDefinedParameterDictionary]::new()
+            Add-DynamicParameter -DynamicParameterDictionary $DynamicParameters -ParameterName 'Namespace' -ParameterType ([string]) -Mandatory -ValidateSet @('default', 'kube-system') -HelpMessage 'Namespace to query.'
+            # Creates a validated 'Namespace' parameter that can be used in a dynamic parameter block.
+
+        .EXAMPLE
+            $Nodes = Get-Nodes
+            Add-DynamicParameter -DynamicParameterDictionary $DynamicParameters -ParameterName 'Node' -ParameterType ([string[]]) -ValidateSet ([array]$Nodes.Name) -Alias 'Name' -ValueFromPipeline -ValueFromPipelineByPropertyName -HelpMessage 'The node to inspect.'
+            # Adds a pipeline-friendly node selector based on the current cluster node inventory.
         #>
 
         [CmdletBinding()]
         param(
-            [Parameter(Mandatory=$True, Position = 0, HelpMessage = 'Runtime defined parameter dictionary to add the parameter into.')]
+            [Parameter(Mandatory=$True, Position=0, HelpMessage='Runtime defined parameter dictionary to add the parameter into.')]
             [System.Management.Automation.RuntimeDefinedParameterDictionary]$DynamicParameterDictionary,
-            [Parameter(Mandatory=$True, Position = 1, HelpMessage = 'Name of the dynamic parameter to create.')]
+            [Parameter(Mandatory=$True, Position=1, HelpMessage='Name of the dynamic parameter to create.')]
             [string]$ParameterName,
-            [Parameter(Mandatory=$True, Position = 2, HelpMessage = 'Type of the dynamic parameter.')]
+            [Parameter(Mandatory=$True, Position=2, HelpMessage='Type of the dynamic parameter.')]
             [Type]$ParameterType,
-            [Parameter(Mandatory=$False, Position = 3, HelpMessage = 'Help message text for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=3, HelpMessage='Help message text for the generated dynamic parameter.')]
             [string]$HelpMessage,
-            [Parameter(Mandatory=$False, Position = 4, HelpMessage = 'Parameter set name for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=4, HelpMessage='Parameter set name for the generated dynamic parameter.')]
             [string]$ParameterSetName,
-            [Parameter(Mandatory=$False, Position = 5, HelpMessage = 'Alias for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=5, HelpMessage='Alias for the generated dynamic parameter.')]
             [string]$Alias,
-            [Parameter(Mandatory=$False, Position = 6, HelpMessage = 'Sets ValueFromPipeline on the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=6, HelpMessage='Sets ValueFromPipeline on the generated dynamic parameter.')]
             [Switch]$ValueFromPipeline,
-            [Parameter(Mandatory=$False, Position = 7, HelpMessage = 'Sets ValueFromPipelineByPropertyName on the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=7, HelpMessage='Sets ValueFromPipelineByPropertyName on the generated dynamic parameter.')]
             [Switch]$ValueFromPipelineByPropertyName,
-            [Parameter(Mandatory=$False, Position = 8, HelpMessage = 'ValidateSet values for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=8, HelpMessage='ValidateSet values for the generated dynamic parameter.')]
             [string[]]$ValidateSet = $null,
-            [Parameter(Mandatory=$False, Position = 9, HelpMessage = 'ValidateRange bounds for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=9, HelpMessage='ValidateRange bounds for the generated dynamic parameter.')]
             [string[]]$ValidateRange = $null,
-            [Parameter(Mandatory=$False, Position = 10, HelpMessage = 'Argument completer scriptblock for the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=10, HelpMessage='Argument completer scriptblock for the generated dynamic parameter.')]
             [scriptblock]$ArgumentCompleter,
-            [Parameter(Mandatory=$False, Position = 11, HelpMessage = 'Additional attributes to apply to the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=11, HelpMessage='Additional attributes to apply to the generated dynamic parameter.')]
             [System.Attribute[]]$CustomAttributes = @(),
-            [Parameter(Mandatory=$False, Position = 12, HelpMessage = 'Marks the generated dynamic parameter as mandatory.')]
+            [Parameter(Mandatory=$False, Position=12, HelpMessage='Marks the generated dynamic parameter as mandatory.')]
             [Switch]$Mandatory,
-            [Parameter(Mandatory=$False, Position = 13, HelpMessage = 'Default value assigned to the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=13, HelpMessage='Default value assigned to the generated dynamic parameter.')]
             $DefaultValue = $null,
-            [Parameter(Mandatory=$False, Position = 14, HelpMessage = 'Position assigned to the generated dynamic parameter.')]
+            [Parameter(Mandatory=$False, Position=14, HelpMessage='Position assigned to the generated dynamic parameter.')]
             [int]$Position = 0
         )
 

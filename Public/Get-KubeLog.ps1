@@ -1,24 +1,41 @@
-Function Get-Log
+Function Get-KubeLog
     {
+        <#
+        .SYNOPSIS
+            Retrieves Kubernetes pod logs for a specific pod or a set of pods selected by label, optionally filtering by container, namespace, previous container instance, time window, or tail length.
+            This command is the log retrieval entry point for KubePS and supports both one-off log reads and live follow mode, making it suitable for troubleshooting running applications and checking recent failures in a namespace or pod set.
+
+        .EXAMPLE
+            Get-KubeLog -Pod api -Namespace default
+            # Reads logs from the api pod in the default namespace and writes the full log output.
+
+        .EXAMPLE
+            Get-KubeLog -Label app=frontend -Namespace default -TailLines 100
+            # Returns the last 100 log lines from pods that match the app=frontend label selector.
+
+        .EXAMPLE
+            Get-KubeLog -Pod api -Namespace default -Follow -Since '30m'
+            # Streams new log output continuously from the past 30 minutes until the stream is stopped.
+        #>
         [CmdletBinding(DefaultParameterSetName = 'Default')]
         param(
-            [Parameter(Mandatory = $False, ParameterSetName = 'Pod', Position = 1, HelpMessage = 'The pod to retrieve logs for.')]
+            [Parameter(Mandatory=$False, ParameterSetName='Pod', Position=1, HelpMessage='The pod to retrieve logs for.')]
             [string]$Pod,
-            [Parameter(Mandatory = $False, ParameterSetName = 'Label', Position = 1, HelpMessage = 'The label to filter pods by.')]
+            [Parameter(Mandatory=$False, ParameterSetName='Label', Position=1, HelpMessage='The label to filter pods by.')]
             [string]$Label,
 
-            [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The container to retrieve logs for.')]
+            [Parameter(Mandatory=$False, Position=1, HelpMessage='The container to retrieve logs for.')]
             [string]$Container,
-            [Parameter(Mandatory = $False, HelpMessage = 'Retrieve logs from the previous instance of the container.')]
+            [Parameter(Mandatory=$False, HelpMessage='Retrieve logs from the previous instance of the container.')]
             [switch]$Previous,
-            [Parameter(Mandatory = $False, HelpMessage = 'The time duration to retrieve logs for. Example: 1h, 30m, 15s.')]
+            [Parameter(Mandatory=$False, HelpMessage='The time duration to retrieve logs for. Example: 1h, 30m, 15s.')]
             [ValidatePattern('^\d+[smhd]$')]
             [String]$Since,
-            [Parameter(Mandatory = $False, HelpMessage = 'The number of lines to retrieve from the end of the log.')]
+            [Parameter(Mandatory=$False, HelpMessage='The number of lines to retrieve from the end of the log.')]
             [int]$TailLines = $null,
-            [Parameter(Mandatory = $False, HelpMessage = 'Output the logs with timestamps.')]
+            [Parameter(Mandatory=$False, HelpMessage='Output the logs with timestamps.')]
             [switch]$Timestamps,
-            [Parameter(Mandatory = $False, HelpMessage = 'Follow the log output.')]
+            [Parameter(Mandatory=$False, HelpMessage='Follow the log output.')]
             [switch]$Follow
         )
 
@@ -30,13 +47,13 @@ Function Get-Log
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Namespaces = Get-Namespace
+                $Namespaces = Get-KubeNamespace
 
                 $ParamList = @(
                     @{
                         ParameterName    = 'Namespace'
                         ParameterType    = ([string])
-                        Default          = $Script:SelectedNamespace
+                        DefaultValue     = $Script:SelectedNamespace
                         Mandatory        = $False
                         ValidateSet      = [array]$Namespaces.Name
                         HelpMessage      = 'The namespace to set as the context for retrieving pod logs.'
@@ -92,7 +109,7 @@ Function Get-Log
 
                 Try
                     {
-                        $PodItems = @(Get-Pod @GetPodParams)
+                        $PodItems = @(Get-KubePod @GetPodParams)
                     }
                 Catch
                     {

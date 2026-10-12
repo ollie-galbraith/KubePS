@@ -2,16 +2,21 @@ Function ConvertFrom-ResourceUsage
     {
         <#
         .SYNOPSIS
-            Converts a resource usage string into a custom object with value and percent.
-            This function takes a resource usage string in the format "Value (Percent%)" and converts it into a custom object with separate properties for the value and the percent.
+            Splits a Kubernetes resource usage string into its numeric value and percentage so results can be displayed or consumed as structured data.
+            This is primarily used when a resource is reported as a string such as "500Mi (50%)" and KubePS needs to preserve both the raw quantity and the utilization percentage separately.
 
         .EXAMPLE
             ConvertFrom-ResourceUsage -Text '500Mi (50%)'
+            # Returns a PSCustomObject with Value = '500Mi' and Percent = 50
+
+        .EXAMPLE
+            ConvertFrom-ResourceUsage -Text '200m (25%)'
+            # Converts CPU values represented as milli-CPU into a formatted value/percent pair.
         #>
 
         [CmdletBinding()]
         param(
-            [Parameter(Mandatory = $true, Position = 0, HelpMessage = 'The resource usage string to convert.')]
+            [Parameter(Mandatory=$True, Position=0, HelpMessage='The resource usage string to convert.')]
             [string]$Text
         )
 

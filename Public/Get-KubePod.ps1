@@ -1,14 +1,31 @@
-Function Get-Pod
+Function Get-KubePod
     {
+        <#
+        .SYNOPSIS
+            Retrieves one or more Kubernetes pods from a namespace or across all namespaces, with support for filtering by name, label, and either a compact summary or full object output.
+            This is the primary pod discovery command in KubePS and is used by log retrieval, port forwarding, and node diagnostics workflows that need to resolve pod identities and runtime status from the cluster.
+
+        .EXAMPLE
+            Get-KubePod -Namespace default
+            # Lists the pods in the default namespace with key state, readiness, and age information.
+
+        .EXAMPLE
+            Get-KubePod -Namespace default -Pod api
+            # Returns the pod named api if it exists in the default namespace.
+
+        .EXAMPLE
+            Get-KubePod -AllNamespaces -Label app=frontend
+            # Finds all pods matching the app=frontend label across every namespace.
+        #>
         [CmdletBinding(DefaultParameterSetName='Default')]
         param(
-            [Parameter(Mandatory = $False, Position = 0, HelpMessage = 'The pod name or regular expression to match.')]
+            [Parameter(Mandatory=$False, Position = 0, HelpMessage = 'The pod name or regular expression to match.')]
             [string]$Pod,
-            [Parameter(Mandatory = $False, Position = 1, HelpMessage = 'The label to filter pods by.')]
+            [Parameter(Mandatory=$False, Position = 1, HelpMessage = 'The label to filter pods by.')]
             [string]$Label,
-            [Parameter(Mandatory = $False, Position = 2, HelpMessage = 'Output full pod information.')]
+            [Parameter(Mandatory=$False, Position = 2, HelpMessage = 'Output full pod information.')]
             [switch]$FullOutput,
-            [Parameter(Mandatory = $False, Position = 3, ParameterSetName='AllNamespaces', HelpMessage = 'Retrieve pods from every namespace.')]
+            [Parameter(Mandatory=$False, Position = 3, ParameterSetName='AllNamespaces', HelpMessage = 'Retrieve pods from every namespace.')]
             [switch]$AllNamespaces
         )
 
@@ -20,13 +37,13 @@ Function Get-Pod
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Namespaces = Get-Namespace
+                $Namespaces = Get-KubeNamespace
 
                 $ParamList = @(
                     @{
                         ParameterName    = 'Namespace'
                         ParameterType    = ([string])
-                        Default          = $Script:SelectedNamespace
+                        DefaultValue     = $Script:SelectedNamespace
                         Mandatory        = $False
                         ValidateSet      = [array]$Namespaces.Name
                         HelpMessage      = 'The namespace to query. Required unless -AllNamespaces is used.'

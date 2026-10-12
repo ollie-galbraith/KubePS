@@ -1,5 +1,22 @@
-Function Get-NodeDescription
+Function Get-KubeNodeDescription
     {
+        <#
+        .SYNOPSIS
+            Returns a rich description of one or more Kubernetes nodes, including labels, taints, conditions, addresses, system info, allocated resources, and the non-terminated pods currently running on each node.
+            This command is the detailed node inspection tool in KubePS and is used by other node-oriented commands to gather capacity and workload information before summarizing it for users.
+
+        .EXAMPLE
+            Get-KubeNodeDescription -Node worker-1
+            # Returns the full metadata and scheduling information for worker-1.
+
+        .EXAMPLE
+            Get-KubeNodeDescription -Node worker-1 | Select-Object -ExpandProperty Conditions
+            # Lists the current readiness, memory pressure, disk pressure, and PID pressure conditions for the node.
+
+        .EXAMPLE
+            Get-KubeNodeDescription -Node worker-1 | Select-Object -ExpandProperty AllocatedResources
+            # Displays how much CPU and memory requests/limits are currently used by workloads on that node.
+        #>
         [CmdletBinding()]
         param()
 
@@ -11,7 +28,7 @@ Function Get-NodeDescription
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Nodes = Get-Nodes
+                $Nodes = Get-KubeNodes
 
                 $ParamList = @(
                     @{
@@ -109,7 +126,7 @@ Function Get-NodeDescription
                                             $Row["${PropertyName}${Metric}Percent"] = $Percent
                                         }
                                 }
-                            $Row['Age'] = Resolve-ResourceAge -Timestamp ([string]$PodItem.Metadata.CreationTimestamp)
+                            $Row['Age'] = Resolve-KubeResourceAge -Timestamp ([string]$PodItem.Metadata.CreationTimestamp)
                             [pscustomobject]$Row
                         }
 
@@ -207,7 +224,7 @@ Function Get-NodeDescription
                                 [pscustomobject]@{
                                     Type    = $_.Type
                                     Reason  = $_.Reason
-                                    Age     = Resolve-ResourceAge -Timestamp ([string]$EventTime)
+                                    Age     = Resolve-KubeResourceAge -Timestamp ([string]$EventTime)
                                     From    = $_.Source.Component
                                     Message = $_.Message
                                 }

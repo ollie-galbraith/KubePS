@@ -1,12 +1,21 @@
-Function Resolve-ResourceAge
+Function Resolve-KubeResourceAge
     {
         <#
         .SYNOPSIS
-            Resolves the age of a Kubernetes resource based on its timestamp.
-            This function calculates the elapsed time since the provided timestamp and returns it in a human-readable format (days, hours, minutes, or seconds).
+            Converts an ISO 8601 Kubernetes timestamp into a compact human-readable age string such as "3d 2h" or "15m".
+            This helper is used repeatedly across KubePS to display age information for resources, pods, nodes, and events without forcing callers to manually calculate elapsed time in PowerShell.
 
         .EXAMPLE
-            Resolve-ResourceAge -Timestamp "2024-06-01T12:00:00Z"
+            Resolve-KubeResourceAge -Timestamp '2024-06-01T12:00:00Z'
+            # Returns a human-readable age such as 10d 2h.
+
+        .EXAMPLE
+            Get-KubeNodes | Select-Object Name, @{Name='Age';Expression={Resolve-KubeResourceAge -Timestamp $_.CreationTimestamp}}
+            # Calculates the age for each node object from its Kubernetes timestamp.
+
+        .EXAMPLE
+            Get-KubeNodeDescription -Node worker-1 | Select-Object -ExpandProperty Events
+            # Uses Resolve-KubeResourceAge internally when building event age fields.
         #>
 
         [CmdletBinding()]
