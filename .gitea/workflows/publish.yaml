@@ -6,14 +6,13 @@ on:
       - main
     paths:
       - 'KubePS.psd1'
-      - 'Public/**'
-      - '.gitea/workflows/build.yml'
+      - '.gitea/workflows/publish.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'KubePS.psd1'
-      - '.gitea/workflows/build.yml'
+      - '.gitea/workflows/publish.yml'
 
 jobs:
   publish:
@@ -22,9 +21,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up PowerShell
-        uses: actions/setup-powershell@v2
 
       - name: Publish KubePS Module
+        shell: pwsh
         run: |
-          pwsh -Command "Publish-Module -Path ./KubePS.psd1 -Repository 'PSGallery' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}"
+          Publish-Module -Path ./KubePS.psd1 -Repository 'PSGallery' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
