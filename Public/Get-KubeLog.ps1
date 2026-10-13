@@ -7,11 +7,15 @@ Function Get-KubeLog
 
         .EXAMPLE
             Get-KubeLog -Pod api -Namespace default
-            # Reads logs from the api pod in the default namespace and writes the full log output.
+            # Reads logs from the api pod in the default namespace and returns them as an array, with one item per log line.
 
         .EXAMPLE
             Get-KubeLog -Label app=frontend -Namespace default -TailLines 100
             # Returns the last 100 log lines from pods that match the app=frontend label selector.
+
+        .EXAMPLE
+            Get-KubeLog -Label app=frontend -Namespace default -AsString
+            # Returns the logs from all matching pods and containers as a single string.
 
         .EXAMPLE
             Get-KubeLog -Pod api -Namespace default -Follow -Since '30m'
@@ -36,7 +40,9 @@ Function Get-KubeLog
             [Parameter(Mandatory=$False, HelpMessage='Output the logs with timestamps.')]
             [switch]$Timestamps,
             [Parameter(Mandatory=$False, HelpMessage='Follow the log output.')]
-            [switch]$Follow
+            [switch]$Follow,
+            [Parameter(Mandatory=$False, HelpMessage='Return the logs as a single string rather than an array of lines.')]
+            [switch]$AsString
         )
 
         DynamicParam
@@ -70,6 +76,13 @@ Function Get-KubeLog
 
         Begin
             {
+                If($AsString -and $Follow)
+                    {
+                        throw '-AsString cannot be used with -Follow.'
+                    }
+
+                $LogLines = [System.Collections.Generic.List[string]]::new()
+
                 $SinceSeconds = $null
                 If([string]::IsNullOrEmpty($Since) -eq $False)
                     {
@@ -182,7 +195,10 @@ Function Get-KubeLog
                                             }
                                         Else
                                             {
-                                                $Reader.ReadToEnd()
+                                                While($null -ne ($Line = $Reader.ReadLine()))
+                                                    {
+                                                        $LogLines.Add($Line)
+                                                    }
                                             }
                                     }
                                 Finally
@@ -192,5 +208,20 @@ Function Get-KubeLog
                                     }
                             }
                     }
+            }
+
+        End
+            {
+                If($Follow)
+                    {
+                        Return
+                    }
+
+                If($AsString)
+                    {
+                        Return ($LogLines -join [Environment]::NewLine)
+                    }
+
+                Return $LogLines.ToArray()
             }
     }
