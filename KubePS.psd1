@@ -12,7 +12,7 @@
 RootModule = 'KubePS.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.3'
+ModuleVersion = '1.1.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -67,7 +67,18 @@ RequiredAssemblies = @(
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-FormatsToProcess = @('KubePS.format.ps1xml')
+FormatsToProcess = @(
+    'formats/KubePS.AllocatedResource.format.ps1xml',
+    'formats/KubePS.Deployment.format.ps1xml',
+    'formats/KubePS.Namespace.format.ps1xml',
+    'formats/KubePS.Node.format.ps1xml',
+    'formats/KubePS.Node.NonTerminatedPods.format.ps1xml',
+    'formats/KubePS.NodeMetric.format.ps1xml',
+    'formats/KubePS.Pod.AllNamespaces.format.ps1xml',
+    'formats/KubePS.Pod.format.ps1xml',
+    'formats/KubePS.PodMetric.format.ps1xml',
+    'formats/KubePS.ReplicaSet.format.ps1xml'
+)
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()

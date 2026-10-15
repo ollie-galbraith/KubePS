@@ -29,7 +29,7 @@ Resolve-KubeResourceAge -Timestamp '2024-06-01T12:00:00Z'
 ```
 #### Example 2
 ```powershell
-Get-KubeNodes | Select-Object Name, @{Name='Age';Expression={Resolve-KubeResourceAge -Timestamp ## Resolve-KubeResourceAge
+Get-KubeNode | Select-Object Name, @{Name='Age';Expression={Resolve-KubeResourceAge -Timestamp ## Resolve-KubeResourceAge
 
 ### Description
 

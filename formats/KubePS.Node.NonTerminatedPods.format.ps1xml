@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>KubePS Node NonTerminated Pods</Name>
+      <ViewSelectedBy>
+        <TypeName>KubePS.Node.NonTerminatedPods</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Namespace</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CpuRequests</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CpuLimits</Label></TableColumnHeader>
+          <TableColumnHeader><Label>MemoryRequests</Label></TableColumnHeader>
+          <TableColumnHeader><Label>MemoryLimits</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Age</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Namespace</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If ($_.cpuRequests) { "$($_.cpuRequests)m ($($_.cpuRequestsPercent)%)" }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If ($_.cpuLimits) { "$($_.cpuLimits)m ($($_.cpuLimitsPercent)%)" }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If ($_.memoryRequests) { "$($_.memoryRequests)Mi ($($_.memoryRequestsPercent)%)" }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If ($_.memoryLimits) { "$($_.memoryLimits)Mi ($($_.MemoryLimitsPercent)%)" }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>Resolve-KubeResourceAge -Timestamp ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

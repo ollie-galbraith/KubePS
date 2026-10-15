@@ -1,4 +1,4 @@
-Function Get-KubeNodes
+Function Get-KubeNode
     {
         <#
         .SYNOPSIS
@@ -6,15 +6,15 @@ Function Get-KubeNodes
             This command queries the node inventory and returns a compact summary object by default, or a more detailed format when -OutputFormat is set to 'Detailed'.
 
         .EXAMPLE
-            Get-KubeNodes
+            Get-KubeNode
             # Lists every cluster node with status, role, age, and version information.
 
         .EXAMPLE
-            Get-KubeNodes -Node 'worker-.*'
+            Get-KubeNode -Node 'worker-.*'
             # Returns only nodes whose names match the regex pattern.
 
         .EXAMPLE
-            Get-KubeNodes -OutputFormat Detailed
+            Get-KubeNode -OutputFormat Detailed
             # Returns the detailed node object format with OS, runtime, kernel, and address details.
         #>
         [CmdletBinding()]
@@ -24,7 +24,9 @@ Function Get-KubeNodes
             [Parameter(Mandatory=$false, Position = 1)]
             [ValidateSet('Wide', 'Detailed')]
             [Alias('Output')]
-            [string]$OutputFormat
+            [string]$OutputFormat,
+            [Parameter(Mandatory=$false)]
+            [Switch]$FullOutput
         )
 
         [System.Collections.Generic.List[object]]$Results = @()
@@ -35,6 +37,12 @@ Function Get-KubeNodes
             {
                 If(([string]::IsNullOrEmpty($Node) -eq $False) -and ($NodeRegexed -eq $False) -and ($NodeItem.Metadata.Name -ne $Node))
                     {
+                        Continue
+                    }
+
+                If($FullOutput -eq $true)
+                    {
+                        $Results.Add($NodeItem)
                         Continue
                     }
 

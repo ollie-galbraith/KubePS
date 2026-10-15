@@ -1,4 +1,4 @@
-Function Get-KubeNodeAllocatedResources
+Function Get-KubeNodeAllocatedResource
     {
         <#
         .SYNOPSIS
@@ -28,7 +28,7 @@ Function Get-KubeNodeAllocatedResources
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Nodes = Get-KubeNodes
+                $Nodes = Get-KubeNode
 
                 $ParamList = @(
                     @{

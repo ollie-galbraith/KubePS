@@ -28,7 +28,7 @@ Function Get-KubeNodeDescription
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Nodes = Get-KubeNodes
+                $Nodes = Get-KubeNode
 
                 $ParamList = @(
                     @{
@@ -87,63 +87,8 @@ Function Get-KubeNodeDescription
                                 $Allocatable[$Resource] = [string]$NodeItem.Status.Allocatable[$Resource]
                             }
 
-                        $ResourceTotals = @{ Requests = @{}; Limits = @{} }
-                        $NonTerminatedPods = foreach ($PodItem in $Pods) {
-                            $PodResources = @{ Requests = @{}; Limits = @{} }
-                            ForEach($Container in $PodItem.Spec.Containers)
-                                {
-                                    ForEach($Metric in 'Requests', 'Limits')
-                                        {
-                                            $Quantities = $Container.Resources.$Metric
-                                            If($null -eq $Quantities)
-                                                {
-                                                    Continue
-                                                }
-                                            ForEach($Resource in $Quantities.Keys)
-                                                {
-                                                    $Value                              = [string]$Quantities[$Resource]
-                                                    $PodResources[$Metric][$Resource]   = [decimal]$PodResources[$Metric][$Resource] + (ConvertTo-KubePSResourceNumber $Value)
-                                                    $ResourceTotals[$Metric][$Resource] = [decimal]$ResourceTotals[$Metric][$Resource] + (ConvertTo-KubePSResourceNumber $Value)
-                                                }
-                                        }
-                                }
-
-                            $Row = [ordered]@{
-                                Namespace = $PodItem.Metadata.NamespaceProperty
-                                Name = $PodItem.Metadata.Name 
-                            }
-
-                            ForEach($Resource in @('cpu', 'memory'))
-                                {
-                                    $PropertyName = If($Resource -eq 'cpu') { 'Cpu' } Else { 'Memory' }
-                                    ForEach($Metric in 'Requests', 'Limits')
-                                        {
-                                            $Value                                  = [decimal]$PodResources[$Metric][$Resource]
-                                            $CapacityValue                          = ConvertTo-KubePSResourceNumber ([string]$NodeItem.Status.Allocatable[$Resource])
-                                            $Percent                                = If($CapacityValue -gt 0) { [math]::Round(($Value / $CapacityValue) * 100) } Else { $null }
-                                            $DisplayValue                           = If($Value -eq 0) { $null } ElseIf($Resource -eq 'cpu') { "$([math]::Round($Value * 1000))m" } Else { "$([math]::Round($Value / 1MB, 2))Mi" }
-                                            $Row["${PropertyName}${Metric}"]        = $DisplayValue
-                                            $Row["${PropertyName}${Metric}Percent"] = $Percent
-                                        }
-                                }
-                            $Row['Age'] = Resolve-KubeResourceAge -Timestamp ([string]$PodItem.Metadata.CreationTimestamp)
-                            [pscustomobject]$Row
-                        }
-
-                        $AllocatedResources = foreach ($Resource in ($ResourceTotals.Requests.Keys + $ResourceTotals.Limits.Keys | Sort-Object -Unique)) {
-                            $Row = [ordered]@{ Resource = $Resource }
-                            ForEach($Metric in 'Requests', 'Limits')
-                                {
-                                    $Value                   = [decimal]$ResourceTotals[$Metric][$Resource]
-                                    $NodeCapacity            = ConvertTo-KubePSResourceNumber ([string]$NodeItem.Status.Allocatable[$Resource])
-                                    $Percent                 = If($NodeCapacity -gt 0) { [math]::Round(($Value / $NodeCapacity) * 100) } Else { $null }
-                                    $Suffix                  = If($Resource -eq 'cpu') { 'm' } ElseIf($Resource -eq 'memory' -or $Resource -eq 'ephemeral-storage' -or $Resource -like 'hugepages-*') { 'B' } Else { '' }
-                                    $DisplayValue            = If($Suffix -eq 'm') { "$([math]::Round($Value * 1000))m" } ElseIf($Suffix -eq 'B') { "$([math]::Round($Value / 1MB, 2))Mi" } Else { [string]$Value }
-                                    $Row[$Metric]            = $DisplayValue
-                                    $Row["${Metric}Percent"] = $Percent
-                                }
-                            [pscustomobject]$Row
-                        }
+                        $NonTerminatedPods = Get-NodeNonTerminatedPod -Pods $Pods -Node $NodeItem
+                        $AllocatedResources = Get-NodeAllocatedResource -Pod $Pods -Node $NodeItem
 
                         $Labels      = [ordered]@{}
                         $Annotations = [ordered]@{}

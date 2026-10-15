@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>KubePS PodMetric</Name>
+      <ViewSelectedBy>
+        <TypeName>KubePS.PodMetric</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Namespace</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CPU</Label><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Memory</Label><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Namespace</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}m' -f [math]::Ceiling($_.Cpu * 1000)</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}Mi' -f [math]::Floor($_.Memory / 1MB)</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>KubePS PodMetric Container</Name>
+      <ViewSelectedBy>
+        <TypeName>KubePS.PodMetric.Container</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Namespace</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Pod</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CPU</Label><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Memory</Label><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Namespace</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Pod</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}m' -f [math]::Ceiling($_.Cpu * 1000)</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}Mi' -f [math]::Floor($_.Memory / 1MB)</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

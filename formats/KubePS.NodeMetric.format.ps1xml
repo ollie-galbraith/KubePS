@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>KubePS NodeMetric</Name>
+      <ViewSelectedBy>
+        <TypeName>KubePS.NodeMetric</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>CPU</Label><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>CPU%</Label><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Memory</Label><Alignment>Right</Alignment></TableColumnHeader>
+          <TableColumnHeader><Label>Memory%</Label><Alignment>Right</Alignment></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}m' -f [math]::Ceiling($_.Cpu * 1000)</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If($null -eq $_.CpuPercent) { '&lt;unknown&gt;' } Else { '{0}%' -f [math]::Floor($_.CpuPercent) }</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>'{0}Mi' -f [math]::Floor($_.Memory / 1MB)</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock>If($null -eq $_.MemoryPercent) { '&lt;unknown&gt;' } Else { '{0}%' -f [math]::Floor($_.MemoryPercent) }</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

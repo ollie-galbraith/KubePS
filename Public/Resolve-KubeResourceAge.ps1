@@ -10,7 +10,7 @@ Function Resolve-KubeResourceAge
             # Returns a human-readable age such as 10d 2h.
 
         .EXAMPLE
-            Get-KubeNodes | Select-Object Name, @{Name='Age';Expression={Resolve-KubeResourceAge -Timestamp $_.CreationTimestamp}}
+            Get-KubeNode | Select-Object Name, @{Name='Age';Expression={Resolve-KubeResourceAge -Timestamp $_.CreationTimestamp}}
             # Calculates the age for each node object from its Kubernetes timestamp.
 
         .EXAMPLE

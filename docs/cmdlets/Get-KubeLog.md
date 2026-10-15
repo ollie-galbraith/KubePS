@@ -15,6 +15,7 @@ Get-KubeLog
 	[-TailLines                                  <System.Int32[ ]>]
 	[-Timestamps <System.Management.Automation.SwitchParameter[ ]>]
 	[-Follow     <System.Management.Automation.SwitchParameter[ ]>]
+	[-AsString   <System.Management.Automation.SwitchParameter[ ]>]
 	[-Label                                     <System.String[ ]>]
 	[-Container                                 <System.String[ ]>]
 	[<CommonParameters>]
@@ -27,6 +28,7 @@ Get-KubeLog
 	[-TailLines                                  <System.Int32[ ]>]
 	[-Timestamps <System.Management.Automation.SwitchParameter[ ]>]
 	[-Follow     <System.Management.Automation.SwitchParameter[ ]>]
+	[-AsString   <System.Management.Automation.SwitchParameter[ ]>]
 	[-Pod                                       <System.String[ ]>]
 	[-Container                                 <System.String[ ]>]
 	[<CommonParameters>]
@@ -43,7 +45,7 @@ Get-KubeLog
 #### Example 1
 ```powershell
 Get-KubeLog -Pod api -Namespace default
-# Reads logs from the api pod in the default namespace and writes the full log output.
+# Reads logs from the api pod in the default namespace and returns them as an array, with one item per log line.
 ```
 #### Example 2
 ```powershell
@@ -52,6 +54,11 @@ Get-KubeLog -Label app=frontend -Namespace default -TailLines 100
 ```
 #### Example 3
 ```powershell
+Get-KubeLog -Label app=frontend -Namespace default -AsString
+# Returns the logs from all matching pods and containers as a single string.
+```
+#### Example 4
+```powershell
 Get-KubeLog -Pod api -Namespace default -Follow -Since '30m'
 # Streams new log output continuously from the past 30 minutes until the stream is stopped.
 ```
@@ -59,6 +66,16 @@ Get-KubeLog -Pod api -Namespace default -Follow -Since '30m'
 ---
 
 ### Parameters
+
+#### -AsString
+
+Return the logs as a single string rather than an array of lines.
+
+|           |                                              |
+| --------- | -------------------------------------------- |
+| Type      | System.Management.Automation.SwitchParameter |
+| Mandatory | False                                        |
+
 
 #### -Container
 

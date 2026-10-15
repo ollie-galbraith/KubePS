@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>KubePS Deployment</Name>
+      <ViewSelectedBy>
+        <TypeName>KubePS.Deployment</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Ready</Label></TableColumnHeader>
+          <TableColumnHeader><Label>UpToDate</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Available</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Age</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Containers</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>"$($_.Ready)/$($_.Replicas)"</ScriptBlock></TableColumnItem>
+              <TableColumnItem><PropertyName>UpToDate</PropertyName></TableColumnItem>
+              <TableColumnItem><PropertyName>Available</PropertyName></TableColumnItem>
+              <TableColumnItem><ScriptBlock>Resolve-KubeResourceAge -Timestamp ([DateTimeOffset]::UtcNow - $_.Age).ToString('o')</ScriptBlock></TableColumnItem>
+              <TableColumnItem><ScriptBlock> $_.Containers.name -join ', '</ScriptBlock></TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -1,4 +1,4 @@
-Function Get-KubeNodePods
+Function Get-KubeNodePodResource
     {
         <#
         .SYNOPSIS
@@ -18,7 +18,10 @@ Function Get-KubeNodePods
             # Retrieves the same workload detail from the full node description object.
         #>
         [CmdletBinding()]
-        param()
+        param(
+            [Parameter(Mandatory=$False)]
+            [string[]]$Pod
+        )
 
         DynamicParam
             {
@@ -28,7 +31,7 @@ Function Get-KubeNodePods
                     DynamicParameterDictionary = $DynamicParameterDictionary
                 }
 
-                $Nodes = Get-KubeNodes
+                $Nodes = Get-KubeNode
 
                 $ParamList = @(
                     @{
@@ -59,15 +62,31 @@ Function Get-KubeNodePods
             }
         Process
             {
-                ForEach($NodeName in $DynamicParameterDictionary['Node'].Value) { $NodeNames.Add($NodeName) }
+                ForEach($NodeName in $DynamicParameterDictionary['Node'].Value)
+                    {
+                        $NodeNames.Add($NodeName)
+                    }
             }
         End
             {
-                ForEach($NodeName in $NodeNames)
+                $NodePods = Get-KubeNodeDescription -Node $NodeName | Select-Object -ExpandProperty NonTerminatedPods
+                ForEach($NodePod in $NodePods)
                     {
-                        $NodePods = Get-KubeNodeDescription -Node $NodeName | Select-Object -ExpandProperty NonTerminatedPods
-                        ForEach($Pod in $NodePods) { $Output.Add($Pod) }
+                        If($Pod.Count -eq 0)
+                            {
+                                $Output.Add($NodePod)
+                                Continue
+                            }
+
+                        ForEach($RequestedPod in $Pod)
+                            {
+                                If($NodePod.Name -match $RequestedPod)
+                                    {
+                                        $Output.Add($NodePod)
+                                    }
+                            }
                     }
+
                 Return $Output
             }
     }

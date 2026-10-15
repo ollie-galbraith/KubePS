@@ -38,6 +38,7 @@ Function Get-KubePod
                 }
 
                 $Namespaces = Get-KubeNamespace
+                $Nodes = Get-KubeNode
 
                 $ParamList = @(
                     @{
@@ -48,7 +49,14 @@ Function Get-KubePod
                         ValidateSet      = [array]$Namespaces.Name
                         HelpMessage      = 'The namespace to query. Required unless -AllNamespaces is used.'
                         Position         = 1
-                        ParameterSetName = 'Namespace'
+                    },
+                    @{
+                        ParameterName    = 'Node'
+                        ParameterType    = ([string])
+                        Mandatory        = $False
+                        ValidateSet      = [array]$Nodes.Name
+                        HelpMessage      = 'The Nodes to query'
+                        Position         = 1
                     }
                 )
 
@@ -63,6 +71,7 @@ Function Get-KubePod
             {
                 [System.Collections.Generic.List[object]]$Output = @()
                 $Namespace = $DynamicParameterDictionary['Namespace'].Value
+                $Node = $DynamicParameterDictionary['Node'].Value
             
                 If((-not $AllNamespaces -and ([String]::IsNullOrEmpty($Label))) -and [string]::IsNullOrWhiteSpace($Namespace))
                     {
@@ -112,7 +121,7 @@ Function Get-KubePod
                     {
                         Write-Verbose "Retrieving pods in all namespaces."
                         $Pods = [k8s.CoreV1OperationsExtensions]::ListPodForAllNamespacesAsync(
-                            $Script:KubePSDirectClient.CoreV1,
+                            $Script:KubePSDirectClient.CoreV1, # Client
                             $null,                             # allowWatchBookmarks
                             $null,                             # continueParameter
                             $null,                             # fieldSelector
@@ -122,20 +131,32 @@ Function Get-KubePod
                 Else
                     {
                         Write-Verbose "Retrieving pods in namespace '$Namespace'."
-                        $Pods = [k8s.CoreV1OperationsExtensions]::ListNamespacedPodAsync($Script:KubePSDirectClient.CoreV1, $Namespace).GetAwaiter().GetResult().Items
+                        $Pods = [k8s.CoreV1OperationsExtensions]::ListNamespacedPodAsync(
+                            $Script:KubePSDirectClient.CoreV1, # Client
+                            $Namespace,                        # Namespace
+                            $null,                             # allowWatchBookmarks
+                            $null,                             # continueParameter
+                            $null,                             # fieldSelector
+                            $Label                             # labelSelector
+                        ).GetAwaiter().GetResult().Items
                     }
 
                 ForEach($PodItem in $Pods)
                     {
-                        If($FullOutput)
+                        If(([String]::IsNullOrEmpty($Node) -eq $False) -and ($PodItem.Spec.NodeName -ne $Node))
                             {
-                                $Output.Add($PodItem)
                                 Continue
                             }
 
                         If(([string]::IsNullOrEmpty($Pod) -eq $False) -and ($PodItem.Metadata.Name -notmatch $Pod))
                             {
-                                continue
+                                Continue
+                            }
+
+                        If($FullOutput)
+                            {
+                                $Output.Add($PodItem)
+                                Continue
                             }
 
                         $ReadyCount = 0
