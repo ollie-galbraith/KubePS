@@ -5,14 +5,14 @@ on:
     branches:
       - main
     paths:
-      - 'KubePS.psd1'
-      - '.gitea/workflows/publish.yaml'
+      - '*.psd1'
+      - .gitea/workflows/publish.yaml
   pull_request:
     branches:
       - main
     paths:
-      - 'KubePS.psd1'
-      - '.gitea/workflows/publish.yaml'
+      - '*.psd1'
+      - .gitea/workflows/publish.yaml
 
 jobs:
   publish:
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Publish KubePS Module
+      - name: Publish PSModuleDocGen Module
         shell: pwsh
         run: |
           $PathsToRemove = @(
@@ -40,6 +40,12 @@ jobs:
           Foreach ($Path in $PathsToRemove)
               {
                   Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+              }
+
+          $RequiredModules = Import-PowerShellDataFile -Path (Get-ChildItem -Filter *.psd1 | Select-Object -First 1).FullName
+          ForEach ($Module in $RequiredModules.RequiredModules)
+              {
+                  Install-PSResource -Name $Module -TrustRepository
               }
 
           Publish-PSResource -Path ./ -Repository 'PSGallery' -ApiKey ${{ secrets.PSGALLERY_API_KEY }}

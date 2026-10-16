@@ -12,7 +12,7 @@
 RootModule = 'KubePS.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.1.4'
+ModuleVersion = '1.2.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -30,7 +30,7 @@ CompanyName = 'Oliver Galbraith'
 Copyright = '(c) Oliver Galbraith. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Kubernetes PowerShell cmdlets built on the official Kubernetes .NET client.'
+Description = 'KubePS provides PowerShell commands for inspecting and troubleshooting Kubernetes clusters through the official Kubernetes .NET client. Select a cluster from your kubeconfig contexts and set a session-level default namespace, then retrieve and filter pods, deployments, ReplicaSets, namespaces, and nodes as concise summaries or full Kubernetes objects. Inspect node and pod metrics, allocated resources, and pod details; retrieve container logs or follow them as a live stream; and forward a local port to a pod. Requires PowerShell 7.4 or later. Metric commands require the cluster metrics API to be available.'
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '7.4'
@@ -51,7 +51,7 @@ PowerShellVersion = '7.4'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-# RequiredModules = @()
+RequiredModules = @('PSDynamicParameters')
 
 # Assemblies that must be loaded prior to importing this module
 RequiredAssemblies = @(
