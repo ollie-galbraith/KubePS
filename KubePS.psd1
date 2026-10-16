@@ -110,13 +110,13 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @('Kubernetes', 'K8s', 'PowerShell', 'PSModule', 'PSGallery')
 
         # A URL to the license for this module.
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri = 'https://github.com/ollie-galbraith/KubePS'
 
         # A URL to an icon representing this module.
         # IconUri = ''

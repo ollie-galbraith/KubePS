@@ -18,7 +18,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     container:
-      image: gitea.oghomelab.com/containers/pwsh:latest # Path to your custom image
+      image: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/pwsh:latest
       credentials:
         username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
@@ -29,4 +29,17 @@ jobs:
       - name: Publish KubePS Module
         shell: pwsh
         run: |
+          $PathsToRemove = @(
+              './docs',
+              './.gitea',
+              './.github',
+              './.vscode',
+              './.git',
+              './README.md'
+          )
+          Foreach ($Path in $PathsToRemove)
+              {
+                  Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+              }
+
           Publish-PSResource -Path ./ -Repository 'PSGallery' -ApiKey ${{ secrets.PSGALLERY_API_KEY }}
