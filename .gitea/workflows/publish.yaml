@@ -17,33 +17,16 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    container:
+      image: gitea.oghomelab.com/containers/pwsh:latest # Path to your custom image
+      credentials:
+        username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+        password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Set up PowerShell
-        run: |
-          # Update package list
-          sudo apt-get update
-          # Install pre-requisite packages
-          sudo apt-get install -y wget apt-transport-https software-properties-common
-          # Download the Microsoft repository key
-          wget -q "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb"
-          # Register the Microsoft repository key
-          sudo dpkg -i packages-microsoft-prod.deb
-          # Delete the deb file after root access
-          rm packages-microsoft-prod.deb
-          # Update package list after adding Microsoft repo
-          sudo apt-get update
-          # Install PowerShell
-          sudo apt-get install -y powershell
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '10.0.x'
-
       - name: Publish KubePS Module
         shell: pwsh
         run: |
-          Publish-Module -Path ./ -Repository 'PSGallery' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
+          Publish-PSResource -Path ./ -Repository 'PSGallery' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
