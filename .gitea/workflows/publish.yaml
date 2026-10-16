@@ -18,7 +18,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     container:
-      image: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}/pwsh:latest
+      image: ${{ secrets.CONTAINER_REGISTRY }}/pwsh:latest
       credentials:
         username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
         password: ${{ secrets.CONTAINER_REGISTRY_PAT }}
