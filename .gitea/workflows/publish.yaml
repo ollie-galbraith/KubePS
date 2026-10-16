@@ -29,4 +29,4 @@ jobs:
       - name: Publish KubePS Module
         shell: pwsh
         run: |
-          Publish-PSResource -Path ./ -Repository 'PSGallery' -NuGetApiKey ${{ secrets.PSGALLERY_API_KEY }}
+          Publish-PSResource -Path ./ -Repository 'PSGallery' -ApiKey ${{ secrets.PSGALLERY_API_KEY }}
