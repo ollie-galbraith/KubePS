@@ -25,7 +25,6 @@ Kubernetes PowerShell cmdlets built on the official Kubernetes .NET client.
 + [Start-KubePortForward](docs/cmdlets/Start-KubePortForward.md)
 
 ##### Private Functions
-+ [Add-DynamicParameter](docs/cmdlets/Private/Add-DynamicParameter.md)
 + [ConvertFrom-DescriptionFields](docs/cmdlets/Private/ConvertFrom-DescriptionFields.md)
 + [ConvertFrom-ResourceUsage](docs/cmdlets/Private/ConvertFrom-ResourceUsage.md)
 + [ConvertTo-KubePSResourceNumber](docs/cmdlets/Private/ConvertTo-KubePSResourceNumber.md)
